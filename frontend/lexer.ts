@@ -1,4 +1,4 @@
-enum TokenType {
+export enum TokenType {
   Identifier,
 
   Number,
@@ -21,9 +21,11 @@ enum TokenType {
   // Keywords
   Let,
   Const,
+
+  EOF,
 }
 
-interface Token {
+export interface Token {
   value: string;
   type: TokenType;
 }
@@ -39,7 +41,9 @@ const SINGLECHAR_MAP: Record<string, TokenType> = {
   "*": TokenType.Multiply,
   "/": TokenType.Divide,
   "%": TokenType.Modulo,
+
   "=": TokenType.Equal,
+
   "(": TokenType.OpenParen,
   ")": TokenType.CloseParen,
   "{": TokenType.OpenBrace,
@@ -54,9 +58,7 @@ function isAlpha(char: string) {
 
 function isDigit(char: string) {
   const BOUNDS = ["0".charCodeAt(0), "9".charCodeAt(0)];
-
-  return char.charCodeAt(0) >= BOUNDS[0] &&
-    char.charCodeAt(0) <= BOUNDS[1];
+  return char.charCodeAt(0) >= BOUNDS[0] && char.charCodeAt(0) <= BOUNDS[1];
 }
 
 function isSkippable(char: string) {
@@ -64,43 +66,48 @@ function isSkippable(char: string) {
   return SKIPPABLES.includes(char);
 }
 
-function token(value: string = "", type: TokenType): Token {
+export function token(value: string = "", type: TokenType): Token {
   return { value, type };
 }
 
-function tokenize(source: string): Token[] {
-  const tokens = new Array<Token>();
+export function tokenize(source: string): Token[] {
+  const tokens: Token[] = [];
+  const stream = source.split("");
 
-  const stream = source.split("").reverse();
+  const length = stream.length;
+  let cursor = 0;
 
-  while (stream.length > 0) {
-    if (isSkippable(stream[stream.length - 1])) {
-      stream.pop();
+  while (cursor < length) {
+    if (isSkippable(stream[cursor])) {
+      cursor++;
       continue;
     }
 
     // Multiple character
-    if (isAlpha(stream[stream.length - 1])) {
+    if (isAlpha(stream[cursor])) {
       let ident = "";
-      while (stream.length > 0 && isAlpha(stream[stream.length - 1])) {
-        ident += stream.pop();
+      while (cursor < length && isAlpha(stream[cursor])) {
+        ident += stream[cursor++];
       }
+
       const reserved = RESERVED_KEYWORDS[ident];
       if (reserved) {
         tokens.push(token(ident, reserved));
       } else {
         tokens.push(token(ident, TokenType.Identifier));
       }
-    } else if (isDigit(stream[stream.length - 1])) {
+    } else if (isDigit(stream[cursor])) {
       let ident = "";
-      while (stream.length > 0 && isDigit(stream[stream.length - 1])) {
-        ident += stream.pop();
+      while (cursor < length && isDigit(stream[cursor])) {
+        ident += stream[cursor++];
       }
+
       tokens.push(token(ident, TokenType.Number));
     } else {
       // Single character
-      const char = stream.pop() || "";
+      const char = stream[cursor++];
       const mappedType = SINGLECHAR_MAP[char];
+
       if (mappedType) {
         tokens.push(token(char, mappedType));
       } else {
@@ -109,6 +116,7 @@ function tokenize(source: string): Token[] {
     }
   }
 
+  tokens.push(token("EOF", TokenType.EOF));
   return tokens;
 }
 
@@ -120,4 +128,6 @@ async function main() {
   }
 }
 
-main();
+if (import.meta.main) {
+  main();
+}
