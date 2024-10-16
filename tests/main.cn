@@ -1,0 +1,3 @@
+let x = 10
+const y = 20 * 30
+let z = (40 - (x / y)) % 20
