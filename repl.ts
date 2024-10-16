@@ -1,4 +1,5 @@
 import Parser from "./frontend/parser.ts";
+import evaluate from "./runtime/interpreter.ts";
 
 function repl() {
   console.log("Custom scripting language REPL v0.1");
@@ -11,7 +12,8 @@ function repl() {
 
     const parser = new Parser();
     const fileAst = parser.produceAst(input);
-    console.log(fileAst);
+    const runtimeValue = evaluate(fileAst);
+    console.dir(runtimeValue, { depth: 10 });
   }
 }
 

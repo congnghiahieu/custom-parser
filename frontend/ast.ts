@@ -1,14 +1,15 @@
 export type AstNodeType =
   | "File"
   | "Identifier"
-  | "NumbericLiteral"
+  | "NumericLiteral"
+  | "NullLiteral"
   | "BinaryExpr";
 
 export interface Stmt {
   nodeType: AstNodeType;
 }
 
-export interface FileAst extends Stmt {
+export interface FileNode extends Stmt {
   nodeType: "File";
   stmts: Stmt[];
 }
@@ -27,7 +28,12 @@ export interface Identifier extends Expr {
   ident: string;
 }
 
-export interface NumbericLiteral extends Expr {
-  nodeType: "NumbericLiteral";
+export interface NumericLiteral extends Expr {
+  nodeType: "NumericLiteral";
   value: number;
+}
+
+export interface NullLiteral extends Expr {
+  nodeType: "NullLiteral";
+  value: "null";
 }

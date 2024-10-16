@@ -21,6 +21,7 @@ export enum TokenType {
   // Keywords
   Let,
   Const,
+  Null,
 
   EOF,
 }
@@ -33,6 +34,7 @@ export interface Token {
 const RESERVED_KEYWORDS: Record<string, TokenType> = {
   "let": TokenType.Let,
   "const": TokenType.Const,
+  "null": TokenType.Null,
 };
 
 const SINGLECHAR_MAP: Record<string, TokenType> = {
@@ -111,7 +113,7 @@ export function tokenize(source: string): Token[] {
       if (mappedType) {
         tokens.push(token(char, mappedType));
       } else {
-        throw new Error(`Unexpected character: ${char}`);
+        throw new Error(`Unexpected character: ${char.charCodeAt(0)}`);
       }
     }
   }

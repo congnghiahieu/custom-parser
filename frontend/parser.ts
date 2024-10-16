@@ -1,9 +1,10 @@
 import {
   BinaryExpr,
   Expr,
-  FileAst,
+  FileNode,
   Identifier,
-  NumbericLiteral,
+  NullLiteral,
+  NumericLiteral,
   Stmt,
 } from "./ast.ts";
 import { Token, tokenize, TokenType } from "./lexer.ts";
@@ -17,10 +18,10 @@ class Parser {
     this.cursor = 0;
   }
 
-  public produceAst(sourceCode: string): FileAst {
+  public produceAst(sourceCode: string): FileNode {
     this.tokens = tokenize(sourceCode);
 
-    const fileAst: FileAst = {
+    const fileAst: FileNode = {
       nodeType: "File",
       stmts: [],
     };
@@ -117,11 +118,20 @@ class Parser {
           nodeType: "Identifier",
           ident: this.eat().value,
         } as Identifier;
+
       case TokenType.Number:
         return {
-          nodeType: "NumbericLiteral",
+          nodeType: "NumericLiteral",
           value: parseFloat(this.eat().value),
-        } as NumbericLiteral;
+        } as NumericLiteral;
+
+      case TokenType.Null:
+        this.eat(); // Skip "null"
+        return {
+          nodeType: "NullLiteral",
+          value: "null",
+        } as NullLiteral;
+
       case TokenType.OpenParen: {
         this.eat(); // Skip "("
         const exprInParen = this.parseExpr();
